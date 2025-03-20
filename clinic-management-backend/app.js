@@ -28,6 +28,10 @@ app.use("/uploads", express.static("uploads")); // ✅ Serve uploaded files
 // ✅ Test database connection
 testConnection();
 
+app.get("/", (req, res) => {
+  res.redirect("http://localhost:5173/login");
+});
+
 // ✅ Register Routes
 app.use("/api/patients", patientRoutes);
 app.use("/api/auth", authRoutes);
