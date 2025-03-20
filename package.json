@@ -28,7 +28,6 @@
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
     "react-router-dom": "^7.3.0",
-    "sequelize": "^6.37.6",
-    "vite": "^6.2.2"
+    "sequelize": "^6.37.6"
   }
 }
