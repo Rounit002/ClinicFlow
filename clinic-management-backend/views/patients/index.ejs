@@ -1,0 +1,38 @@
+<div class="page-header">
+    <h1>All Patients</h1>
+    <a href="/patients/create" class="btn primary">Add New Patient</a>
+  </div>
+  
+  <% if (patients.length === 0) { %>
+    <div class="empty-state">
+      <p>No patients found. Add your first patient to get started.</p>
+    </div>
+  <% } else { %>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Date of Birth</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% patients.forEach(patient => { %>
+            <tr>
+              <td><%= patient.name %></td>
+              <td><%= patient.email %></td>
+              <td><%= patient.phone || 'N/A' %></td>
+              <td><%= patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : 'N/A' %></td>
+              <td>
+                <a href="/patients/<%= patient.id %>" class="btn small">View</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+  
