@@ -29,7 +29,7 @@ app.use("/uploads", express.static("uploads")); // ✅ Serve uploaded files
 testConnection();
 
 app.get("/", (req, res) => {
-  res.redirect("http://localhost:5173/login");
+  res.send('Clinic Management Backend is running');
 });
 
 // ✅ Register Routes
