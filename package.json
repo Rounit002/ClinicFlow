@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-"scripts": {
-  "dev": "nodemon Backend/app.js",
-  "build": "cd Frontend && npm install && npm run build",
-  "start": "node Backend/app.js",
-  "test": "echo \"Error: no test specified\" && exit 1",
-  "sequelize": "NODE_OPTIONS=--experimental-json-modules npx sequelize-cli"
-},
+  "scripts": {
+    "dev": "nodemon Backend/app.js",
+    "build": "npm install && npm install --prefix Frontend && npm run build --prefix Frontend",
+    "start": "nodemon Backend/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sequelize": "NODE_OPTIONS=--experimental-json-modules npx sequelize-cli"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
