@@ -8,10 +8,13 @@ import dashboardRoutes from "./routes/api/dashboard.js";
 import appointmentRoutes from "./routes/api/appointments.js";
 import documentRoutes from "./routes/api/documents.js"; // ✅ Added document route
 import userRoutes from "./routes/api/userRoutes.js";
+import path from "path";
 
 // ✅ Initialize express app
 dotenv.config();
 const app = express();
+
+const _dirname=path.resolve();
 
 // ✅ Middleware
 app.use(cors({
@@ -28,10 +31,6 @@ app.use("/uploads", express.static("uploads")); // ✅ Serve uploaded files
 // ✅ Test database connection
 testConnection();
 
-app.get("/", (req, res) => {
-  res.send('Clinic Management Backend is running');
-});
-
 // ✅ Register Routes
 app.use("/api/patients", patientRoutes);
 app.use("/api/auth", authRoutes);
@@ -40,6 +39,10 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/documents", documentRoutes); // ✅ Register document API
 app.use("/api/users", userRoutes);
 
+app.use(express.static(path.join(_dirname,"/Frontend/dist")));
+app.get('*',(_,res)=>{
+  res.sendFile(path.resolve(_dirname,"Frontend","dist","index.html"));
+})
 
 // ✅ Handle 404 for Undefined Routes
 app.use((req, res) => {
