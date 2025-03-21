@@ -65,8 +65,9 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log("✅ Database synced successfully.");
+// Sync Database (Force sync to recreate tables)
+sequelize.sync({ force: true }).then(() => {
+  console.log("✅ Database synced successfully with force: true.");
 });
 
 // ✅ Sync Database (Development Mode Only)
