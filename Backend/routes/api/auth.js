@@ -28,11 +28,19 @@ router.post("/register", async (req, res) => {
 
     // Insert new user into the database
     const [newUser] = await sequelize.query(
-      `INSERT INTO users (username, email, password, phone_number, role) 
-      VALUES (:username, :email, :password, :phone_number, :role) 
+      `INSERT INTO users (username, email, password, phone_number, role, created_at, updated_at) 
+      VALUES (:username, :email, :password, :phone_number, :role, :created_at, :updated_at) 
       RETURNING id, username, email, phone_number, role`,
       {
-        replacements: { username, email, password, phone_number, role },
+        replacements: {
+          username,
+          email,
+          password,
+          phone_number,
+          role,
+          created_at: new Date(), // Provide a value for created_at
+          updated_at: new Date(), // Provide a value for updated_at
+        },
         type: sequelize.QueryTypes.INSERT,
       }
     );
