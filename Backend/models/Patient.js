@@ -8,6 +8,7 @@ const PatientModelFactory = (sequelize) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
@@ -26,7 +27,7 @@ const PatientModelFactory = (sequelize) => {
         type: DataTypes.STRING, // Remove ENUM constraint
         allowNull: false,
         validate: {
-          isIn: [['male', 'female', 'other']], // Enforce allowed values in app logic
+          isIn: [['male', 'female', 'other']],
         },
       },
       address: {

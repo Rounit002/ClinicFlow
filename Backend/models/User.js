@@ -3,10 +3,10 @@ import { DataTypes } from "sequelize";
 const UserModelFactory = (sequelize) => {
   const User = sequelize.define("User", {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER, // Change from UUID to INTEGER
+      autoIncrement: true, // Enable auto-increment
       primaryKey: true,
-      allowNull:false,
+      allowNull: false,
     },
     username: {
       type: DataTypes.STRING,

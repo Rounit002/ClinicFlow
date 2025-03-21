@@ -5,9 +5,10 @@ const AppointmentModelFactory = (sequelize) => {
     "Appointment",
     {
       id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.INTEGER, // Change from UUID to INTEGER
+        autoIncrement: true,
         primaryKey: true,
+        allowNull: false,
       },
       patient_name: {
         type: DataTypes.STRING,
@@ -34,10 +35,13 @@ const AppointmentModelFactory = (sequelize) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("scheduled", "completed", "cancelled"),
+        type: DataTypes.STRING, // Removed ENUM constraint
         allowNull: false,
         defaultValue: "scheduled",
-      },
+        validate: {
+          isIn: [['scheduled', 'completed', 'cancelled']],
+        },
+      },      
       notes: {
         type: DataTypes.TEXT,
         allowNull: true,
@@ -61,7 +65,7 @@ const AppointmentModelFactory = (sequelize) => {
         },
       },
       booked_by: {  // ✅ Corrected placement
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: true,
         references: {
           model: "users",

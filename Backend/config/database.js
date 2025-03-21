@@ -60,8 +60,8 @@ const testConnection = async () => {
 // ✅ Sync Database
 const syncDB = async () => {
   try {
-    await sequelize.sync({ alter: true });
-    console.log("✅ Database synchronized.");
+    await sequelize.sync({ force: true });
+    console.log("✅ Database synchronized with force: true.");
   } catch (error) {
     console.error("❌ Error synchronizing database:", error);
   }
@@ -72,6 +72,7 @@ export const models = {
   Patient,
   Appointment,
   User,
+  Sequelize,
 };
 
 export { sequelize, testConnection, syncDB };
