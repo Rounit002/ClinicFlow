@@ -24,7 +24,7 @@ const Prescriptions = () => {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/user", {
+      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/auth/user", {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch user");
@@ -37,7 +37,7 @@ const Prescriptions = () => {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/appointments/user/${user.id}`);
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/appointments/user/${user.id}`);
       if (!response.ok) throw new Error("Failed to fetch appointments");
       const data = await response.json();
       setAppointments(data);
@@ -71,7 +71,7 @@ const Prescriptions = () => {
                 {appointment.prescription_file ? (
                   <Button variant="outline" size="sm" className="h-8 w-full">
                     <a
-                      href={`http://localhost:3000${appointment.prescription_file}`}
+                      href={`https://clinicflow-e7a9.onrender.com${appointment.prescription_file}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

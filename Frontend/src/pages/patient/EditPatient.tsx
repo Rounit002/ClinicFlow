@@ -16,7 +16,7 @@ const EditPatient = () => {
 
   const fetchPatientDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/patients/${patientId}`);
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/patients/${patientId}`);
       if (!response.ok) throw new Error("Failed to fetch patient details");
       const data = await response.json();
       setPatient(data);
@@ -27,7 +27,7 @@ const EditPatient = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/${patientId}`);
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${patientId}`);
       if (!response.ok) throw new Error("Failed to fetch documents");
       const data = await response.json();
       setDocuments(data);
@@ -49,7 +49,7 @@ const EditPatient = () => {
     const formData = new FormData();
     selectedFiles.forEach((file) => formData.append("documents", file));
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/${patientId}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${patientId}`, {
         method: "POST",
         body: formData,
       });
@@ -64,7 +64,7 @@ const EditPatient = () => {
   const handleDelete = async (documentId) => {
     if (!window.confirm("Are you sure you want to delete this document?")) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/documents/${documentId}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${documentId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Delete failed");
@@ -109,7 +109,7 @@ const EditPatient = () => {
               documents.map((doc) => (
                 <li key={doc.id} className="p-3 flex justify-between items-center border-b last:border-b-0">
                   <a
-                    href={`http://localhost:3000${doc.file_path}`}
+                    href={`https://clinicflow-e7a9.onrender.com${doc.file_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

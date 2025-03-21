@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { PageTitle } from '@/components/ui/PageTitle';
+// import { PageTitle } from '@/components/ui/PageTitle';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -48,7 +48,7 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
-      <PageTitle title="Settings" description="Manage your account settings and preferences" />
+      {/* <PageTitle title="Settings" description="Manage your account settings and preferences" /> */}
       
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

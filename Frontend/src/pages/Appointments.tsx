@@ -17,7 +17,7 @@ const Appointments = () => {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/appointments");
+      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/appointments");
 
       if (!response.ok) {
         throw new Error(`Server responded with ${response.status}: ${response.statusText}`);

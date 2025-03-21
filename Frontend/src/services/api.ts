@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://clinicflow-e7a9.onrender.com/api';
 
 // Add a request interceptor to include the auth token
 axios.interceptors.request.use(

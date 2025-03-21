@@ -18,7 +18,7 @@ const _dirname=path.resolve();
 
 // ✅ Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:8080"], // ✅ Allow frontend (Vite) & admin panel
+  origin: ["https://clinicflow-e7a9.onrender.com"], // ✅ Allow frontend (Vite) & admin panel
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
