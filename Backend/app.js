@@ -6,7 +6,7 @@ import patientRoutes from "./routes/patientRoutes.js";
 import authRoutes from "./routes/api/auth.js";
 import dashboardRoutes from "./routes/api/dashboard.js";
 import appointmentRoutes from "./routes/api/appointments.js";
-import documentRoutes from "./routes/api/documents.js"; // ✅ Added document route
+import documentRoutes from "./routes/api/documents.js";
 import userRoutes from "./routes/api/userRoutes.js";
 import path from "path";
 
@@ -18,7 +18,7 @@ const _dirname=path.resolve();
 
 // ✅ Middleware
 app.use(cors({
-  origin: ["https://clinicflow-e7a9.onrender.com"], // ✅ Allow frontend (Vite) & admin panel
+  origin: ["https://clinicflow-e7a9.onrender.com"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -65,11 +65,15 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
+sequelize.sync({ alter: true }).then(() => {
+  console.log("✅ Database synced successfully.");
+});
+
 // ✅ Sync Database (Development Mode Only)
-if (process.env.NODE_ENV !== "production") {
-  sequelize.sync({ alter: true }).then(() => {
-    console.log("✅ Database synced successfully.");
-  });
-}
+// if (process.env.NODE_ENV !== "production") {
+//   sequelize.sync({ alter: true }).then(() => {
+//     console.log("✅ Database synced successfully.");
+//   });
+// }
 
 export default app;

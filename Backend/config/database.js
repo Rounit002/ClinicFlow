@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 import PatientModelFactory from "../models/Patient.js";
 import AppointmentModelFactory from "../models/Appointment.js";
+import UserModelFactory from "../models/User.js";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ const sequelize = new Sequelize(
 // ✅ Initialize Models
 const Patient = PatientModelFactory(sequelize);
 const Appointment = AppointmentModelFactory(sequelize);
+const User=UserModelFactory(sequelize);
 
 // ✅ Define Relationships
 Patient.hasMany(Appointment, { foreignKey: "patient_id", onDelete: "CASCADE" });
@@ -69,6 +71,7 @@ const syncDB = async () => {
 export const models = {
   Patient,
   Appointment,
+  User,
 };
 
 export { sequelize, testConnection, syncDB };
