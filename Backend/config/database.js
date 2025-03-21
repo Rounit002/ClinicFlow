@@ -14,12 +14,19 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: "postgres",
     port: process.env.DB_PORT,
-    logging: false, // ❌ Disable logging for cleaner output
+    logging: false,
     pool: {
       max: 5,
       min: 0,
       acquire: 30000,
       idle: 10000,
+    },
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // Required for Render
+        sslmode: "require",
+      },
     },
   }
 );
@@ -32,20 +39,25 @@ const Appointment = AppointmentModelFactory(sequelize);
 Patient.hasMany(Appointment, { foreignKey: "patient_id", onDelete: "CASCADE" });
 Appointment.belongsTo(Patient, { foreignKey: "patient_id", onDelete: "CASCADE" });
 
-// ✅ Test Database Connection
+// ✅ Test Database Connection with Retry Logic
 const testConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("✅ Database connection established successfully.");
-  } catch (error) {
-    console.error("❌ Unable to connect to the database:", error);
+  for (let i = 0; i < 5; i++) {
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Database connection established successfully.");
+      break;
+    } catch (error) {
+      console.error("❌ Unable to connect to the database:", error);
+      if (i === 4) throw error; // Throw error after max retries
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+    }
   }
 };
 
 // ✅ Sync Database
 const syncDB = async () => {
   try {
-    await sequelize.sync({ alter: true }); // ✅ Ensures DB is in sync
+    await sequelize.sync({ alter: true });
     console.log("✅ Database synchronized.");
   } catch (error) {
     console.error("❌ Error synchronizing database:", error);
