@@ -24,8 +24,9 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false, // Required for Render
+        rejectUnauthorized: false,
         sslmode: "require",
+        minVersion: "TLSv1.2", // Ensure compatibility with Render
       },
     },
   }
