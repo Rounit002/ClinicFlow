@@ -6,6 +6,7 @@ const UserModelFactory = (sequelize) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+      allowNull:false,
     },
     username: {
       type: DataTypes.STRING,
