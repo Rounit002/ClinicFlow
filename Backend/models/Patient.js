@@ -25,7 +25,7 @@ const PatientModelFactory = (sequelize) => {
       },
       gender: {
         type: DataTypes.STRING, // Remove ENUM constraint
-        allowNull: false,
+        allowNull: true,
         validate: {
           isIn: [['male', 'female', 'other']],
         },
