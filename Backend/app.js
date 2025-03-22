@@ -18,7 +18,11 @@ const _dirname=path.resolve();
 
 // ✅ Middleware
 app.use(cors({
-  origin: ["https://clinicflow-e7a9.onrender.com"],
+  origin: [
+    "https://clinicflow-e7a9.onrender.com", // Your web app
+    "http://localhost", // Cordova WebView (for development)
+    "file://" // Cordova WebView (for production on device)
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
