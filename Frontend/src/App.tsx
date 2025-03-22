@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import PatientLayout from "./components/layout/PatientLayout";
 import Index from "./pages/Index";
@@ -17,6 +17,12 @@ import Settings from "./pages/patient/Settings";
 import Prescriptions from "./pages/patient/Prescriptions"; // ✅ Import Prescriptions page
 import BookAppointment from "./pages/patient/BookAppointment";
 import PatientDashboard from "./pages/patient/Dashboard";
+
+declare global {
+  interface Window {
+    cordova?: any;
+  }
+}
 
 const queryClient = new QueryClient();
 
@@ -48,14 +54,17 @@ const PatientRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const isCordova = typeof window !== 'undefined' && !!window.cordova;
+const Router = isCordova ? HashRouter : BrowserRouter;
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <Router>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} /> {/* ✅ Added Register route */}
 
@@ -92,7 +101,7 @@ const App = () => (
           {/* Not found route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </TooltipProvider>
   </QueryClientProvider>
 );
