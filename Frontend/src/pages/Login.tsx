@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertCircle } from 'lucide-react';
 
 const Login = () => {
-  const [loginIdentifier, setLoginIdentifier] = useState(''); // ✅ Username or Phone Number
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ const Login = () => {
     setIsLoading(true);
     setError('');
 
-    // ✅ Validate inputs
+    // Validate inputs
     if (!loginIdentifier.trim() || !password.trim()) {
       setError('Please enter username/phone and password');
       setIsLoading(false);
@@ -32,7 +32,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ loginIdentifier, password }), // ✅ Send username OR phone
+        body: JSON.stringify({ loginIdentifier, password }),
         credentials: 'include',
       });
 
@@ -120,13 +120,11 @@ const Login = () => {
           </Button>
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>Don't have an account? 
-              <a 
-                href="/register" 
-                className="text-clinic-600 hover:underline ml-1"
-              >
+            <p>
+              Don't have an account?{' '}
+              <Link to="/register" className="text-clinic-600 hover:underline ml-1">
                 Sign up here
-              </a>
+              </Link>
             </p>
           </div>
         </form>

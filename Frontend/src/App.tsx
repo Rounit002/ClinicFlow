@@ -54,7 +54,7 @@ const PatientRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const isCordova = typeof window !== 'undefined' && !!window.cordova;
+const isCordova = !!window.cordova;
 const Router = isCordova ? HashRouter : BrowserRouter;
 
 const App = () => (
@@ -64,7 +64,7 @@ const App = () => (
       <Sonner />
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} /> {/* ✅ Added Register route */}
 
