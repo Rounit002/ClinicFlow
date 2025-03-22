@@ -21,6 +21,7 @@ app.use(cors({
   origin: [
     "https://clinicflow-e7a9.onrender.com", // Your web app
     "http://localhost", // Cordova WebView (for development)
+    "https://localhost", // Add this for USB debugging
     "file://" // Cordova WebView (for production on device)
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
