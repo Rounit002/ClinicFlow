@@ -71,15 +71,15 @@ app.listen(PORT, () => {
 });
 
 // Sync Database (Force sync to recreate tables)
-sequelize.sync({ force: true }).then(() => {
-  console.log("✅ Database synced successfully with force: true.");
-});
+// sequelize.sync({ force: true }).then(() => {
+//   console.log("✅ Database synced successfully with force: true.");
+// });
 
 // ✅ Sync Database (Development Mode Only)
-// if (process.env.NODE_ENV !== "production") {
-  // sequelize.sync({ alter: true }).then(() => {
-  //   console.log("✅ Database synced successfully.");
-  // });
-// }
+if (process.env.NODE_ENV !== "production") {
+  sequelize.sync({ alter: true }).then(() => {
+    console.log("✅ Database synced successfully.");
+  });
+}
 
 export default app;
