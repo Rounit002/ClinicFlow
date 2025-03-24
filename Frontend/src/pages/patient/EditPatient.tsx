@@ -17,7 +17,7 @@ const EditPatient = () => {
 
   const fetchPatientDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/patients/${patientId}`);
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/patients/${patientId}`);
       if (!response.ok) throw new Error("Failed to fetch patient details");
       const data = await response.json();
       setPatient(data);
@@ -33,7 +33,7 @@ const EditPatient = () => {
         throw new Error('Authentication required');
       }
   
-      const response = await fetch(`http://localhost:3000/api/documents/${patientId}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${patientId}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,7 +68,7 @@ const EditPatient = () => {
         throw new Error('Authentication required');
       }
   
-      const response = await fetch(`http://localhost:3000/api/documents/${patientId}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${patientId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ const EditPatient = () => {
         throw new Error('Authentication required');
       }
   
-      const response = await fetch(`http://localhost:3000/api/documents/${documentId}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/documents/${documentId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -160,7 +160,7 @@ const EditPatient = () => {
                   className="p-3 flex flex-col sm:flex-row sm:justify-between sm:items-center border-b last:border-b-0 space-y-2 sm:space-y-0"
                 >
                   <a
-                    href={`http://localhost:3000${doc.file_path}`}
+                    href={`https://clinicflow-e7a9.onrender.com${doc.file_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

@@ -76,10 +76,10 @@ app.listen(PORT, () => {
 // });
 
 // ✅ Sync Database (Development Mode Only)
-if (process.env.NODE_ENV !== "production") {
+// if (process.env.NODE_ENV !== "production") {
   sequelize.sync({ alter: true }).then(() => {
     console.log("✅ Database synced successfully.");
   });
-}
+// }
 
 export default app;

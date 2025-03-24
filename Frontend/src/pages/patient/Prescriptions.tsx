@@ -27,7 +27,7 @@ const Prescriptions = () => {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/user", {
+      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/auth/user", {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch user");
@@ -43,7 +43,7 @@ const Prescriptions = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`http://localhost:3000/api/appointments/user/${user.id}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/appointments/user/${user.id}`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (response.status === 404) {
