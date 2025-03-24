@@ -27,7 +27,7 @@ const Prescriptions = () => {
     if (!token) return;
 
     try {
-      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/auth/user", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/user`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch user");
@@ -43,14 +43,19 @@ const Prescriptions = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`https://clinicflow-e7a9.onrender.com/appointments/user/${user.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/user/${user.id}`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
+
       if (response.status === 404) {
         setAppointments([]);
         return;
       }
-      if (!response.ok) throw new Error("Failed to fetch appointments");
+      if (!response.ok) {
+        const errorText = await response.text(); // Log the raw response for debugging
+        console.error("❌ Fetch appointments failed:", response.status, errorText);
+        throw new Error("Failed to fetch appointments");
+      }
       const data = await response.json();
       setAppointments(data);
     } catch (error) {
@@ -64,11 +69,15 @@ const Prescriptions = () => {
     setIsDialogOpen(true);
   };
 
-  // ✅ Function to force download
-  const handleDownload = (url, fileName) => {
+  const handleDownload = (documentId) => {
+    const token = localStorage.getItem("token");
+    const downloadUrl = `${process.env.REACT_APP_API_URL}/api/documents/download/${documentId}`;
+
     const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName; // Forces the browser to download the file
+    link.href = downloadUrl;
+    link.setAttribute("download", "");
+    link.setAttribute("rel", "noopener noreferrer");
+    link.setAttribute("Authorization", `Bearer ${token}`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -85,7 +94,6 @@ const Prescriptions = () => {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-base">Patient: {appointment.patient_name || "N/A"}</CardTitle>
                     <CardTitle className="text-base">Doctor: {appointment.doctor_type || "N/A"}</CardTitle>
                     <CardDescription className="mt-1 flex items-center text-xs text-muted-foreground gap-1">
                       <Calendar className="h-3 w-3" /> {new Date(appointment.date).toLocaleDateString()}
@@ -114,7 +122,7 @@ const Prescriptions = () => {
                       variant="outline"
                       size="sm"
                       className="w-full"
-                      onClick={() => handleDownload(doc.file_path, doc.file_name)} // ✅ Use handleDownload
+                      onClick={() => handleDownload(doc.id)}
                     >
                       <Download className="h-4 w-4 mr-1" /> Download {doc.file_name}
                     </Button>
@@ -130,7 +138,6 @@ const Prescriptions = () => {
         )}
       </div>
 
-      {/* Dialog for Appointment Details */}
       {selectedAppointment && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
@@ -141,11 +148,12 @@ const Prescriptions = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2">
-              <p><strong>Patient Name:</strong> {selectedAppointment.patient_name || "N/A"}</p>
-              <p><strong>Patient Phone:</strong> {selectedAppointment.patient_phone || "N/A"}</p>
+              <p><strong>Patient:</strong> {selectedAppointment.patient_name || "N/A"}</p>
               <p><strong>Doctor:</strong> {selectedAppointment.doctor_type || "N/A"}</p>
               <p><strong>Date:</strong> {new Date(selectedAppointment.date).toLocaleDateString()}</p>
               <p><strong>Time:</strong> {selectedAppointment.appointment_time || "N/A"}</p>
+              <p><strong>Patient Name:</strong> {selectedAppointment.patient_name || "N/A"}</p>
+              <p><strong>Patient Phone:</strong> {selectedAppointment.patient_phone || "N/A"}</p>
               <p><strong>Purpose:</strong> {selectedAppointment.reason}</p>
               <p><strong>Status:</strong> {selectedAppointment.status}</p>
               <p><strong>Notes:</strong> {selectedAppointment.notes || "N/A"}</p>
