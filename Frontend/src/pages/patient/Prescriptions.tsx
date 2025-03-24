@@ -27,7 +27,7 @@ const Prescriptions = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/user`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/auth/user`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch user");
@@ -43,7 +43,7 @@ const Prescriptions = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication required");
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/user/${user.id}`, {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/appointments/user/${user.id}`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
 
@@ -71,7 +71,7 @@ const Prescriptions = () => {
 
   const handleDownload = (documentId) => {
     const token = localStorage.getItem("token");
-    const downloadUrl = `${process.env.REACT_APP_API_URL}/api/documents/download/${documentId}`;
+    const downloadUrl = `https://clinicflow-e7a9.onrender.com/api/documents/download/${documentId}`;
 
     const link = document.createElement("a");
     link.href = downloadUrl;
@@ -94,6 +94,7 @@ const Prescriptions = () => {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>
+                   <CardTitle className="text-base">Patient: {appointment.patient_name || "N/A"}</CardTitle>
                     <CardTitle className="text-base">Doctor: {appointment.doctor_type || "N/A"}</CardTitle>
                     <CardDescription className="mt-1 flex items-center text-xs text-muted-foreground gap-1">
                       <Calendar className="h-3 w-3" /> {new Date(appointment.date).toLocaleDateString()}
