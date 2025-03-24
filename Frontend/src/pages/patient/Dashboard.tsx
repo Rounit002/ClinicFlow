@@ -34,7 +34,7 @@ const PatientDashboard = () => {
         return;
       }
 
-      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/auth/user", {
+      const response = await fetch("http://localhost:3000/api/auth/user", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const PatientDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/appointments/patient/${user.id}/latest`);
+      const response = await fetch(`http://localhost:3000/api/appointments/patient/${user.id}/latest`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -78,7 +78,7 @@ const PatientDashboard = () => {
   
       console.log("🟡 Fetching recent activity for user:", user.id);
   
-      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/users/patient/${user.id}/recent-activity`);
+      const response = await fetch(`http://localhost:3000/api/users/patient/${user.id}/recent-activity`);
   
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

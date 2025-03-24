@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, User, Mail, Phone, Trash, Edit, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile'; // Import the useIsMobile hook
 
 export interface Patient {
   id: string;
@@ -31,6 +32,7 @@ const PatientList: React.FC<PatientListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const isMobile = useIsMobile(); // Use the hook to detect mobile
 
   const filteredPatients = patients.filter((patient) => 
     (patient.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,7 +103,91 @@ const PatientList: React.FC<PatientListProps> = ({
             </button>
           )}
         </div>
+      ) : isMobile ? (
+        // Mobile view: Card-based layout
+        <div className="p-4 space-y-4">
+          {filteredPatients.map((patient) => (
+            <div
+              key={patient.id}
+              className="p-4 border rounded-lg shadow-sm hover:bg-muted/20 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <div className="h-8 w-8 rounded-full bg-clinic-50 flex items-center justify-center mr-3">
+                    <User className="h-4 w-4 text-clinic-600" />
+                  </div>
+                  <span className="font-medium">{patient.name}</span>
+                </div>
+                <div className="relative">
+                  <button 
+                    className="h-8 w-8 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
+                    onClick={() => toggleDropdown(patient.id)}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                  {activeDropdown === patient.id && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40"
+                        onClick={() => setActiveDropdown(null)}
+                      />
+                      <div className="absolute right-0 top-full mt-1 w-48 rounded-md bg-white shadow-elevation-2 border z-50">
+                        <div className="py-1">
+                          <button
+                            className="w-full px-4 py-2 text-left text-sm flex items-center hover:bg-muted transition-colors"
+                            onClick={() => {
+                              onEditPatient?.(patient);
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Patient
+                          </button>
+                          <button
+                            className="w-full px-4 py-2 text-left text-sm flex items-center text-red-600 hover:bg-muted transition-colors"
+                            onClick={() => {
+                              onDeletePatient?.(patient);
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            <Trash className="h-4 w-4 mr-2" />
+                            Delete Patient
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center">
+                  <Mail className="h-3 w-3 mr-2 text-muted-foreground" />
+                  <span>{patient.email}</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-3 w-3 mr-2 text-muted-foreground" />
+                  <span>{patient.phone}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Age: </span>
+                  <span>{patient.age}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Gender: </span>
+                  <span>{patient.gender}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Last Visit: </span>
+                  <span className="text-muted-foreground">
+                    {patient.lastVisit || "No visits"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
+        // Desktop view: Table layout
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -166,7 +252,6 @@ const PatientList: React.FC<PatientListProps> = ({
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </button>
-                      
                       {activeDropdown === patient.id && (
                         <>
                           <div 

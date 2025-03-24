@@ -26,7 +26,7 @@ const Patients = () => {
         return;
       }
 
-      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/patients", {
+      const response = await fetch("http://localhost:3000/api/patients", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

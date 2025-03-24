@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import PatientModelFactory from "../models/Patient.js";
 import AppointmentModelFactory from "../models/Appointment.js";
 import UserModelFactory from "../models/User.js";
+import DocumentModelFactory from "../models/Document.js"; // ✅ Import Document factory
 
 dotenv.config();
 
@@ -36,11 +37,14 @@ const sequelize = new Sequelize(
 // ✅ Initialize Models
 const Patient = PatientModelFactory(sequelize);
 const Appointment = AppointmentModelFactory(sequelize);
-const User=UserModelFactory(sequelize);
+const User = UserModelFactory(sequelize);
+const Document = DocumentModelFactory(sequelize); // ✅ Use factory function
 
 // ✅ Define Relationships
 Patient.hasMany(Appointment, { foreignKey: "patient_id", onDelete: "CASCADE" });
 Appointment.belongsTo(Patient, { foreignKey: "patient_id", onDelete: "CASCADE" });
+Appointment.hasMany(Document, { foreignKey: "appointment_id", as: "documents" });
+Document.belongsTo(Appointment, { foreignKey: "appointment_id", as: "appointment" });
 
 // ✅ Test Database Connection with Retry Logic
 const testConnection = async () => {
@@ -51,8 +55,8 @@ const testConnection = async () => {
       break;
     } catch (error) {
       console.error("❌ Unable to connect to the database:", error);
-      if (i === 4) throw error; // Throw error after max retries
-      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      if (i === 4) throw error;
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
 };
@@ -72,6 +76,7 @@ export const models = {
   Patient,
   Appointment,
   User,
+  Document,
   Sequelize,
 };
 

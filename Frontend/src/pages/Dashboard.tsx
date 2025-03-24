@@ -16,11 +16,11 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const statsRes = await fetch("https://clinicflow-e7a9.onrender.com/api/dashboard/stats");
+      const statsRes = await fetch("http://localhost:3000/api/dashboard/stats");
       const statsData = await statsRes.json();
       setStats(statsData);
 
-      const appointmentsRes = await fetch("https://clinicflow-e7a9.onrender.com/api/appointments");
+      const appointmentsRes = await fetch("http://localhost:3000/api/appointments");
 
       if (!appointmentsRes.ok) {
         throw new Error(`Failed to fetch appointments: ${appointmentsRes.status}`);

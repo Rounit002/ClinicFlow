@@ -38,7 +38,7 @@ const BookAppointment = () => {
           return;
         }
 
-        const response = await fetch("https://clinicflow-e7a9.onrender.com/api/auth/user", {
+        const response = await fetch("http://localhost:3000/api/auth/user", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -86,7 +86,7 @@ const BookAppointment = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch("https://clinicflow-e7a9.onrender.com/api/appointments", {
+      const response = await fetch("http://localhost:3000/api/appointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

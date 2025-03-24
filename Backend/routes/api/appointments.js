@@ -1,9 +1,35 @@
 import express from "express";
-import db, { sequelize } from "../../config/database.js";
+import db, { sequelize, models } from "../../config/database.js";
 import { auth, isAdmin } from "../../middleware/auth.js";
 import { QueryTypes } from "sequelize";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import cloudinary from "cloudinary";
 
 const router = express.Router();
+
+// ✅ Configure Cloudinary
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ✅ Configure multer for temporary file storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = "./uploads/";
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 
 // Get all appointments (admin only)
 router.get("/", async (req, res) => {
@@ -26,12 +52,10 @@ router.get("/", async (req, res) => {
        ORDER BY a.date DESC`
     );
 
-    console.log("✅ Raw Query Result:", result); // Log full response
+    console.log("✅ Raw Query Result:", result);
 
-    // ✅ Extract the first array if result is nested
     const appointments = Array.isArray(result) ? result[0] : result.rows;
 
-    // ✅ Ensure response is valid
     if (!appointments || appointments.length === 0) {
       console.warn("⚠️ No appointments found.");
       return res.status(404).json({ message: "No appointments found" });
@@ -44,13 +68,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // Get appointments for a specific date
 router.get("/date/:date", async (req, res) => {
   try {
     const date = req.params.date;
     
-    console.log("🔍 Checking for appointments on:", date); // Debugging log
+    console.log("🔍 Checking for appointments on:", date);
     
     if (!date) {
       return res.status(400).json({ error: "Date parameter is required" });
@@ -71,7 +94,7 @@ router.get("/date/:date", async (req, res) => {
       [date]
     );
 
-    console.log("✅ API Response for Date Query:", result.rows); // Debugging log
+    console.log("✅ API Response for Date Query:", result.rows);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No appointments found for this date" });
@@ -114,52 +137,50 @@ router.get("/patient/:patientId/latest", async (req, res) => {
   }
 });
 
-
+// Get appointments for a specific patient
 router.get("/appointments/:id", async (req, res) => {
   const { id } = req.params;
 
-  console.log("Received patient ID:", id); // 🔍 Debugging
+  console.log("Received patient ID:", id);
 
   if (!id) {
-      return res.status(400).json({ error: "Patient ID is required" });
+    return res.status(400).json({ error: "Patient ID is required" });
   }
 
   try {
-      const result = await sequelize.query(
-          `SELECT id, 
-                  TO_CHAR(date, 'YYYY-MM-DD') as date, 
-                  reason, 
-                  status, 
-                  notes, 
-                  TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at, 
-                  TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI:SS') as updated_at 
-           FROM appointments
-           WHERE patient_id = :patientId
-           ORDER BY date DESC`,
-          {
-              type: QueryTypes.SELECT,
-              replacements: { patientId: id }, // ✅ Using named parameter
-          }
-      );
+    const result = await sequelize.query(
+      `SELECT id, 
+              TO_CHAR(date, 'YYYY-MM-DD') as date, 
+              reason, 
+              status, 
+              notes, 
+              TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at, 
+              TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI:SS') as updated_at 
+       FROM appointments
+       WHERE patient_id = :patientId
+       ORDER BY date DESC`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { patientId: id },
+      }
+    );
 
-      res.json(result);
+    res.json(result);
   } catch (error) {
-      console.error("❌ Error fetching patient appointments:", error);
-      res.status(500).json({ error: "Server error" });
+    console.error("❌ Error fetching patient appointments:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
+// Create a new appointment
 router.post("/", async (req, res) => {
-  const {booked_by, patient_name, patient_phone, date, appointment_time, doctor_type, reason} = req.body;
+  const { booked_by, patient_name, patient_phone, date, appointment_time, doctor_type, reason } = req.body;
 
   try {
     console.log("📥 Received Data:", req.body);
 
-    // ✅ Get current timestamp
     const now = new Date().toISOString();
 
-    // Step 1: Insert Patient if not exists
     let patientQuery = `
       INSERT INTO patients (name, phone, created_at, updated_at) 
       VALUES ($1, $2, $3, $4)
@@ -177,17 +198,16 @@ router.post("/", async (req, res) => {
       type: QueryTypes.INSERT,
     });
 
-    const patient_id = patientResult[0][0].id; // Extract inserted patient ID
+    const patient_id = patientResult[0][0].id;
     console.log("✅ Patient ID:", patient_id);
 
-    // Step 2: Insert Appointment with patient_id
     let appointmentQuery = `
-   INSERT INTO appointments (patient_id, patient_name, patient_phone, date, appointment_time, doctor_type, reason, booked_by) 
-   VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-   RETURNING *;
- `;
+      INSERT INTO appointments (patient_id, patient_name, patient_phone, date, appointment_time, doctor_type, reason, booked_by) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      RETURNING *;
+    `;
 
- const appointmentValues = [patient_id, patient_name, patient_phone, date, appointment_time, doctor_type, reason, booked_by];
+    const appointmentValues = [patient_id, patient_name, patient_phone, date, appointment_time, doctor_type, reason, booked_by];
 
     console.log("📤 Appointment Query String:", appointmentQuery);
     console.log("📤 Appointment Query Values:", appointmentValues);
@@ -234,35 +254,105 @@ router.patch("/:id/status", async (req, res) => {
   }
 });
 
-// Get appointments for a user (where they are either patient or booked_by)
-router.get("/user/:userId", async (req, res) => {
+// ✅ Upload prescription document for an appointment (Doctor only)
+router.post("/:appointmentId/prescription", auth, isAdmin, upload.single("prescription"), async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const appointment = await models.Appointment.findByPk(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    console.log("🔍 Uploading prescription to Cloudinary for appointment:", appointmentId);
+
+    // ✅ Determine the resource type based on file extension
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
+    const isImage = [".jpg", ".jpeg", ".png", ".gif"].includes(fileExtension);
+    const resourceType = isImage ? "image" : "raw";
+
+    // ✅ Upload the file as a stream to prevent corruption
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.v2.uploader.upload_stream(
+        {
+          folder: `appointments/${appointmentId}`,
+          public_id: `${Date.now()}-${path.parse(req.file.originalname).name}`,
+          resource_type: resourceType,
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      fs.createReadStream(req.file.path).pipe(stream);
+    });
+
+    console.log("✅ Prescription uploaded to Cloudinary:", result.secure_url);
+
+    const document = await models.Document.create({
+      patient_id: appointment.patient_id,
+      appointment_id: appointmentId,
+      file_name: req.file.originalname,
+      file_path: result.secure_url,
+    });
+
+    console.log("✅ Prescription saved to database:", document.id);
+
+    fs.unlinkSync(req.file.path);
+    console.log("✅ Temporary file deleted");
+
+    res.json({ message: "Prescription uploaded successfully", document });
+  } catch (error) {
+    console.error("❌ Error uploading prescription:", error);
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
+// ✅ Get appointments for a user with associated documents
+router.get("/user/:userId", auth, async (req, res) => {
   try {
     const { userId } = req.params;
-    const result = await db.query(
-      `SELECT a.id, 
-              TO_CHAR(a.date, 'YYYY-MM-DD') as date, 
-              a.reason, 
-              a.status, 
-              a.notes, 
-              a.patient_id,
-              a.booked_by,
-              p.name as patient_name, 
-              p.phone as patient_phone
-       FROM appointments a
-       JOIN patients p ON a.patient_id = p.id
-       WHERE a.patient_id = $1 OR a.booked_by = $1
-       ORDER BY a.date DESC`,
-      [userId]
-    );
 
-    if (!result.rows || result.rows.length === 0) {
+    // ✅ Ensure the logged-in user can only access their own appointments
+    if (req.user.id !== parseInt(userId) && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    const appointments = await models.Appointment.findAll({
+      where: {
+        [models.Sequelize.Op.or]: [
+          { patient_id: userId },
+          { booked_by: userId },
+        ],
+      },
+      include: [
+        {
+          model: models.Document,
+          as: "documents",
+          required: false,
+        },
+      ],
+      order: [["date", "DESC"]],
+    });
+
+    if (!appointments || appointments.length === 0) {
       return res.status(404).json({ message: "No appointments found for this user" });
     }
 
-    res.json(result.rows);
+    res.json(appointments);
   } catch (error) {
     console.error("❌ Error fetching user appointments:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: error.message });
   }
 });
 
