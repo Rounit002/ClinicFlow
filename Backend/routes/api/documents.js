@@ -128,7 +128,6 @@ router.get("/:patientId", auth, async (req, res) => {
 });
 
 // ✅ Download a document
-// ✅ Download a document
 router.get("/download/:documentId", auth, async (req, res) => {
   try {
     const { documentId } = req.params;
@@ -141,6 +140,7 @@ router.get("/download/:documentId", auth, async (req, res) => {
     const fileUrl = document.file_path;
     const fileName = document.file_name;
 
+    // ✅ Determine the Content-Type based on file extension
     const fileExtension = path.extname(fileName).toLowerCase();
     let contentType = "application/octet-stream";
     if (fileExtension === ".pdf") {
@@ -153,12 +153,11 @@ router.get("/download/:documentId", auth, async (req, res) => {
       contentType = "image/gif";
     }
 
-    // ✅ Encode the fileName to handle special characters
-    const encodedFileName = encodeURIComponent(fileName);
-
+    // ✅ Set headers to force download for all file types
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", `attachment; filename="${encodedFileName}"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
 
+    // ✅ Stream the file from Cloudinary
     https.get(fileUrl, (response) => {
       if (response.statusCode !== 200) {
         return res.status(response.statusCode).json({ message: "Failed to fetch file from Cloudinary" });
