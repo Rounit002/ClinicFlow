@@ -69,18 +69,37 @@ const Prescriptions = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDownload = (documentId) => {
+  const handleDownload = async (documentId, fileName) => {
     const token = localStorage.getItem("token");
     const downloadUrl = `https://clinicflow-e7a9.onrender.com/api/documents/download/${documentId}`;
-
-    const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.setAttribute("download", "");
-    link.setAttribute("rel", "noopener noreferrer");
-    link.setAttribute("Authorization", `Bearer ${token}`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  
+    try {
+      const response = await fetch(downloadUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("❌ Download failed:", errorData);
+        alert(`Failed to download: ${errorData.message || "Unknown error"}`);
+        return;
+      }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName; // Use the original file name
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("❌ Error downloading file:", error);
+      alert("An error occurred while downloading the file.");
+    }
   };
 
   return (
@@ -118,15 +137,15 @@ const Prescriptions = () => {
 
                 {appointment.documents && appointment.documents.length > 0 ? (
                   appointment.documents.map((doc) => (
-                    <Button
-                      key={doc.id}
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleDownload(doc.id)}
+                  <Button
+                    key={doc.id}
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleDownload(doc.id, doc.file_name)}
                     >
-                      <Download className="h-4 w-4 mr-1" /> Download {doc.file_name}
-                    </Button>
+                    <Download className="h-4 w-4 mr-1" /> Download {doc.file_name}
+                  </Button>
                   ))
                 ) : (
                   <p className="text-sm text-gray-500">No prescription uploaded yet.</p>
