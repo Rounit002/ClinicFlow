@@ -31,5 +31,8 @@
     "react-router-dom": "^7.3.0",
     "sequelize": "^6.37.6",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/cordova": "^11.0.3"
   }
 }
