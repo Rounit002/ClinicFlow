@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link
 import { Calendar, Clock, Phone, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,9 +26,9 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({
     <div className={cn("bg-white rounded-2xl p-6 border shadow-elevation-1 animate-scale-in", className)}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-medium">Today's Appointments</h3>
-        <a href="/appointments" className="text-sm text-clinic-600 hover:text-clinic-700 font-medium">
+        <Link to="/appointments" className="text-sm text-clinic-600 hover:text-clinic-700 font-medium">
           View all
-        </a>
+        </Link>
       </div>
       
       {appointments.length === 0 ? (

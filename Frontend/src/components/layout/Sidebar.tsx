@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { 
   Calendar, 
   ChevronLeft, 
@@ -21,6 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate(); // Add useNavigate
 
   useEffect(() => {
     setMobileOpen(false);
@@ -47,9 +48,27 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     { name: 'Settings', path: '/settings', icon: Settings },
   ];  
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/auth/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (response.ok) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        navigate("/login");
+      } else {
+        throw new Error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      navigate("/login");
+    }
   };
 
   return (

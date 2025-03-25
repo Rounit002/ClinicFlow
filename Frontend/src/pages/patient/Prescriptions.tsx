@@ -76,77 +76,41 @@ const Prescriptions = () => {
     const isCordova = !!window.cordova;
   
     try {
+      if (!token) {
+        console.error("❌ No token found in localStorage");
+        alert("You are not authenticated. Please log in and try again.");
+        return;
+      }
+  
       if (isCordova) {
-        // Request storage permissions
-        const permissions = window.cordova.plugins.permissions;
-        const writePermission = permissions.WRITE_EXTERNAL_STORAGE;
-        const readPermission = permissions.READ_EXTERNAL_STORAGE;
+        // Wait for deviceready event to ensure plugins are loaded
+        await new Promise<void>((resolve) => {
+          document.addEventListener("deviceready", () => {
+            console.log("✅ deviceready event fired");
+            resolve();
+          }, false);
+        });
   
-        const checkAndRequestPermission = (permission: any) =>
-          new Promise((resolve, reject) => {
-            permissions.checkPermission(permission, (status: any) => {
-              if (status.hasPermission) {
-                resolve(true);
-              } else {
-                permissions.requestPermission(
-                  permission,
-                  (status: any) => {
-                    if (status.hasPermission) {
-                      resolve(true);
-                    } else {
-                      reject(new Error("Permission denied"));
-                    }
-                  },
-                  (error: any) => reject(error)
-                );
-              }
-            }, (error: any) => reject(error));
-          });
-  
-        try {
-          await checkAndRequestPermission(writePermission);
-          await checkAndRequestPermission(readPermission);
-        } catch (error) {
-          console.error("❌ Permission error:", error);
-          alert("Storage permissions are required to download files.");
+        // Check network status
+        if (navigator.connection && navigator.connection.type === "none") {
+          console.error("❌ No internet connection");
+          alert("No internet connection. Please connect to the internet and try again.");
           return;
         }
   
-        const fileTransfer = new window.FileTransfer();
-        const uri = encodeURI(downloadUrl);
-        const targetPath = `${cordova.file.documentsDirectory}${fileName}`;
+        // Sanitize fileName to remove invalid characters
+        const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+        console.log("Sanitized file name:", sanitizedFileName);
   
-        console.log("Downloading from:", uri);
-        console.log("Saving to:", targetPath);
+        // Log available directories
+        console.log("Documents directory:", cordova.file.documentsDirectory);
+        console.log("External data directory:", cordova.file.externalDataDirectory);
+        console.log("Cache directory:", cordova.file.cacheDirectory);
+  
+        // Download using fetch and save using cordova-plugin-file
+        console.log("Fetching from:", downloadUrl);
         console.log("Token:", token);
   
-        fileTransfer.download(
-          uri,
-          targetPath,
-          (entry: any) => {
-            console.log("✅ File downloaded to: " + entry.toURL());
-            alert("File downloaded successfully: " + fileName);
-          },
-          (error: any) => {
-            console.error("❌ Download error:", {
-              code: error.code,
-              source: error.source,
-              target: error.target,
-              http_status: error.http_status,
-              body: error.body,
-              exception: error.exception,
-            });
-            alert(`Failed to download file: ${error.code} (HTTP Status: ${error.http_status || "unknown"})`);
-          },
-          true,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        // Browser download
         const response = await fetch(downloadUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -154,10 +118,144 @@ const Prescriptions = () => {
         });
   
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error("❌ Download failed:", errorData);
-          alert(`Failed to download: ${errorData.message || "Unknown error"}`);
-          return;
+          let errorMessage = "Failed to download file";
+          try {
+            const errorData = await response.json();
+            console.error("❌ Download failed:", {
+              status: response.status,
+              statusText: response.statusText,
+              errorData,
+            });
+            errorMessage = errorData.message || errorMessage;
+          } catch (jsonError) {
+            console.error("❌ Failed to parse error response:", jsonError);
+            errorMessage = `Server error (Status: ${response.status})`;
+          }
+          throw new Error(errorMessage);
+        }
+  
+        const blob = await response.blob();
+        console.log("✅ File downloaded, blob size:", blob.size);
+  
+        // Try multiple directories as a fallback
+        const directories = [
+          cordova.file.externalDataDirectory, // App-specific external storage (preferred for Android 10+)
+          cordova.file.cacheDirectory,        // Temporary storage (usually works without permissions)
+          cordova.file.documentsDirectory,    // Documents directory (might require permissions)
+        ].filter(dir => dir); // Filter out null/undefined directories
+  
+        let targetPath = null;
+        let fileSaved = false;
+        let lastError = null;
+  
+        for (const directory of directories) {
+          try {
+            targetPath = `${directory}${sanitizedFileName}`;
+            console.log("Attempting to save to:", targetPath);
+  
+            await new Promise((resolve, reject) => {
+              window.resolveLocalFileSystemURL(
+                directory,
+                (dirEntry: any) => {
+                  console.log(`✅ Accessed directory: ${directory}`);
+                  dirEntry.getFile(
+                    sanitizedFileName,
+                    { create: true, exclusive: false },
+                    (fileEntry: any) => {
+                      console.log("✅ Created file entry");
+                      fileEntry.createWriter(
+                        (fileWriter: any) => {
+                          fileWriter.onwriteend = () => {
+                            console.log("✅ File saved to: " + fileEntry.toURL());
+                            resolve(fileEntry.toURL());
+                          };
+                          fileWriter.onerror = (e: any) => {
+                            console.error("❌ Failed to write file:", e);
+                            reject(new Error("Failed to write file"));
+                          };
+                          fileWriter.write(blob);
+                        },
+                        (error: any) => {
+                          console.error("❌ Error creating file writer:", error);
+                          reject(new Error("Failed to create file writer"));
+                        }
+                      );
+                    },
+                    (error: any) => {
+                      console.error("❌ Error getting file:", {
+                        errorCode: error.code,
+                        errorMessage: error.message || "Unknown error",
+                      });
+                      reject(new Error("Failed to access file system"));
+                    }
+                  );
+                },
+                (error: any) => {
+                  console.error(`❌ Error accessing directory ${directory}:`, {
+                    errorCode: error.code,
+                    errorMessage: error.message || "Unknown error",
+                  });
+                  reject(new Error("Failed to access directory"));
+                }
+              );
+            });
+  
+            fileSaved = true;
+            break; // Exit the loop if successful
+          } catch (error) {
+            lastError = error;
+            console.error(`❌ Failed to save file in ${directory}:`, error);
+          }
+        }
+  
+        if (!fileSaved) {
+          throw new Error(`Failed to save file in any directory: ${lastError?.message || "Unknown error"}`);
+        }
+  
+        alert("File downloaded successfully: " + sanitizedFileName);
+  
+        // Optionally open the file
+        if (window.cordova.plugins.fileOpener2) {
+          window.cordova.plugins.fileOpener2.open(
+            targetPath,
+            "application/pdf", // Adjust MIME type based on file
+            {
+              error: (e: any) => {
+                console.error("❌ Error opening file:", e);
+                alert("Failed to open file.");
+              },
+              success: () => {
+                console.log("✅ File opened successfully");
+              },
+            }
+          );
+        }
+      } else {
+        // Browser download
+        console.log("Fetching from:", downloadUrl);
+        console.log("Token:", token);
+  
+        const response = await fetch(downloadUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          let errorMessage = "Failed to download file";
+          try {
+            const errorData = await response.json();
+            console.error("❌ Download failed:", {
+              status: response.status,
+              statusText: response.statusText,
+              errorData,
+            });
+            errorMessage = errorData.message || errorMessage;
+          } catch (jsonError) {
+            console.error("❌ Failed to parse error response:", jsonError);
+            errorMessage = `Server error (Status: ${response.status})`;
+          }
+          throw new Error(errorMessage);
         }
   
         const blob = await response.blob();
@@ -172,7 +270,8 @@ const Prescriptions = () => {
       }
     } catch (error) {
       console.error("❌ Error downloading file:", error);
-      alert("An error occurred while downloading the file.");
+      alert(`Failed to download: ${error.message}`);
+      throw error;
     }
   };
 

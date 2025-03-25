@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { AlertCircle } from 'lucide-react';
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>(''); // ✅ Added phone number
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [role, setRole] = useState<string>('patient');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,14 +20,12 @@ const Register: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    // ✅ Validate inputs
     if (!username.trim() || !email.trim() || !phoneNumber.trim() || !password.trim()) {
       setError('All fields are required');
       setIsLoading(false);
       return;
     }
 
-    // ✅ Validate phone number format
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phoneNumber)) {
       setError('Invalid phone number. Must be 10 digits.');
@@ -41,7 +39,7 @@ const Register: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, phone_number: phoneNumber, password, role }), // ✅ Send phone number
+        body: JSON.stringify({ username, email, phone_number: phoneNumber, password, role }),
       });
 
       const data = await response.json();
@@ -114,7 +112,7 @@ const Register: React.FC = () => {
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
-            <p>Already have an account? <a href="/login" className="text-clinic-600 hover:underline">Sign in</a></p>
+            <p>Already have an account? <Link to="/login" className="text-clinic-600 hover:underline">Sign in</Link></p>
           </div>
         </form>
       </div>
