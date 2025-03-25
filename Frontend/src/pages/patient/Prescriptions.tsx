@@ -72,18 +72,54 @@ const Prescriptions = () => {
   const handleDownload = async (documentId: string, fileName: string) => {
     const token = localStorage.getItem("token");
     const downloadUrl = `https://clinicflow-e7a9.onrender.com/api/documents/download/${documentId}`;
-
+  
     const isCordova = !!window.cordova;
-
+  
     try {
       if (isCordova) {
-        // Cordova-specific download using FileTransfer
+        // Request storage permissions
+        const permissions = window.cordova.plugins.permissions;
+        const writePermission = permissions.WRITE_EXTERNAL_STORAGE;
+        const readPermission = permissions.READ_EXTERNAL_STORAGE;
+  
+        const checkAndRequestPermission = (permission: any) =>
+          new Promise((resolve, reject) => {
+            permissions.checkPermission(permission, (status: any) => {
+              if (status.hasPermission) {
+                resolve(true);
+              } else {
+                permissions.requestPermission(
+                  permission,
+                  (status: any) => {
+                    if (status.hasPermission) {
+                      resolve(true);
+                    } else {
+                      reject(new Error("Permission denied"));
+                    }
+                  },
+                  (error: any) => reject(error)
+                );
+              }
+            }, (error: any) => reject(error));
+          });
+  
+        try {
+          await checkAndRequestPermission(writePermission);
+          await checkAndRequestPermission(readPermission);
+        } catch (error) {
+          console.error("❌ Permission error:", error);
+          alert("Storage permissions are required to download files.");
+          return;
+        }
+  
         const fileTransfer = new window.FileTransfer();
         const uri = encodeURI(downloadUrl);
-
-        // Determine the target path for saving the file
-        const targetPath = `${cordova.file.documentsDirectory}${fileName}`; // Adjust directory as needed
-
+        const targetPath = `${cordova.file.documentsDirectory}${fileName}`;
+  
+        console.log("Downloading from:", uri);
+        console.log("Saving to:", targetPath);
+        console.log("Token:", token);
+  
         fileTransfer.download(
           uri,
           targetPath,
@@ -92,10 +128,17 @@ const Prescriptions = () => {
             alert("File downloaded successfully: " + fileName);
           },
           (error: any) => {
-            console.error("❌ Download error:", error);
-            alert("Failed to download file: " + error.code);
+            console.error("❌ Download error:", {
+              code: error.code,
+              source: error.source,
+              target: error.target,
+              http_status: error.http_status,
+              body: error.body,
+              exception: error.exception,
+            });
+            alert(`Failed to download file: ${error.code} (HTTP Status: ${error.http_status || "unknown"})`);
           },
-          true, // Trust all hosts (set to false in production if needed)
+          true,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -109,14 +152,14 @@ const Prescriptions = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) {
           const errorData = await response.json();
           console.error("❌ Download failed:", errorData);
           alert(`Failed to download: ${errorData.message || "Unknown error"}`);
           return;
         }
-
+  
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
