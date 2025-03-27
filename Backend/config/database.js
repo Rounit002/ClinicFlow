@@ -23,14 +23,14 @@ const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000,
     },
-    // dialectOptions: {
-    //   ssl: {
-    //     require: true,
-    //     rejectUnauthorized: false,
-    //     sslmode: "require",
-    //     minVersion: "TLSv1.2", // Ensure compatibility with Render
-    //   },
-    // },
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+        sslmode: "require",
+        minVersion: "TLSv1.2", // Ensure compatibility with Render
+      },
+    },
   }
 );
 
