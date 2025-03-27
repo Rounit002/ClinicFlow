@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import PatientSidebar from './PatientSidebar';
@@ -14,7 +13,7 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({ className }) => {
     <div className="min-h-screen flex w-full">
       <PatientSidebar />
       
-      <main className="flex-1 lg:ml-20 xl:ml-64 min-h-screen flex flex-col">
+      <main className="flex-1 lg:ml-20 xl:ml-64 min-h-screen flex flex-col bg-background">
         <Header />
         
         <div className={cn("flex-1 p-6 md:p-8 animate-fade-in", className)}>

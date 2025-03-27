@@ -9,7 +9,8 @@ import {
   FileText, 
   Settings,
   Menu,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -44,13 +45,14 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     { name: 'Dashboard', path: '/', icon: Home },
     { name: 'Patients', path: '/patients', icon: Users },
     { name: 'Appointments', path: '/appointments', icon: Calendar },
-    { name: 'Billing', path: '/billing', icon: FileText },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    // { name: 'Billing', path: '/billing', icon: FileText },
+    { name: 'Profile', path: '/profile', icon: User },
+    // { name: 'Settings', path: '/settings', icon: Settings },
   ];  
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/auth/logout`, {
+      const response = await fetch(`http://localhost:3000/api/auth/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

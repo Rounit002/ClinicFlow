@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 import { Calendar, Clock, Phone, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,9 +23,14 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({
   className
 }) => {
   return (
-    <div className={cn("bg-white rounded-2xl p-6 border shadow-elevation-1 animate-scale-in", className)}>
+    <div
+      className={cn(
+        "bg-card rounded-2xl p-6 border border-border shadow-elevation-1 animate-scale-in",
+        className
+      )}
+    >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-medium">Today's Appointments</h3>
+        <h3 className="font-medium text-foreground">Today's Appointments</h3>
         <Link to="/appointments" className="text-sm text-clinic-600 hover:text-clinic-700 font-medium">
           View all
         </Link>
@@ -34,7 +39,7 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({
       {appointments.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <h3 className="text-lg font-medium mb-1">No appointments today</h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">No appointments today</h3>
           <p className="text-sm text-muted-foreground">
             There are no appointments scheduled for today.
           </p>
@@ -52,7 +57,7 @@ const AppointmentPreview: React.FC<AppointmentPreviewProps> = ({
                     <User className="h-5 w-5 text-clinic-700" />
                   </div>
                   <div>
-                    <h4 className="font-medium">{appointment.patientName}</h4>
+                    <h4 className="font-medium text-foreground">{appointment.patientName}</h4>
                     <p className="text-xs text-muted-foreground">{appointment.type}</p>
                   </div>
                 </div>

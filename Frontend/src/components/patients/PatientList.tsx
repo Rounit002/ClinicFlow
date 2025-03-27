@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, User, Mail, Phone, Trash, Edit, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile'; // Import the useIsMobile hook
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface Patient {
   id: string;
@@ -32,7 +32,7 @@ const PatientList: React.FC<PatientListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const isMobile = useIsMobile(); // Use the hook to detect mobile
+  const isMobile = useIsMobile();
 
   const filteredPatients = patients.filter((patient) => 
     (patient.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,10 +49,10 @@ const PatientList: React.FC<PatientListProps> = ({
   };
 
   return (
-    <div className={cn("bg-white rounded-2xl border shadow-elevation-1 animate-scale-in overflow-hidden", className)}>
-      <div className="p-6 border-b">
+    <div className={cn("bg-card rounded-2xl border border-border shadow-elevation-1 animate-scale-in overflow-hidden", className)}>
+      <div className="p-6 border-b border-border">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 className="font-medium">Patient Records</h3>
+          <h3 className="font-medium text-foreground">Patient Records</h3>
           
           <div className="flex items-center gap-3">
             <div className="relative flex-1 sm:min-w-[240px]">
@@ -60,13 +60,13 @@ const PatientList: React.FC<PatientListProps> = ({
               <input 
                 type="text" 
                 placeholder="Search patients..." 
-                className="w-full h-9 pl-9 pr-4 rounded-lg bg-background border"
+                className="w-full h-9 pl-9 pr-4 rounded-lg bg-background border border-border"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             
-            <button className="h-9 px-3 rounded-lg border hover:bg-muted transition-colors">
+            <button className="h-9 px-3 rounded-lg border border-border hover:bg-muted transition-colors">
               <Filter className="h-4 w-4" />
             </button>
             
@@ -84,12 +84,12 @@ const PatientList: React.FC<PatientListProps> = ({
       {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-pulse mx-auto h-12 w-12 rounded-full bg-muted mb-3"></div>
-          <h3 className="text-lg font-medium mb-1">Loading patients...</h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">Loading patients...</h3>
         </div>
       ) : filteredPatients.length === 0 ? (
         <div className="text-center py-12">
           <User className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <h3 className="text-lg font-medium mb-1">No patients found</h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">No patients found</h3>
           <p className="text-sm text-muted-foreground">
             {searchTerm ? "Try different search terms" : "Add your first patient to get started"}
           </p>
@@ -109,14 +109,14 @@ const PatientList: React.FC<PatientListProps> = ({
           {filteredPatients.map((patient) => (
             <div
               key={patient.id}
-              className="p-4 border rounded-lg shadow-sm hover:bg-muted/20 transition-colors"
+              className="p-4 border border-border rounded-lg shadow-sm hover:bg-muted/20 transition-colors"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
                   <div className="h-8 w-8 rounded-full bg-clinic-50 flex items-center justify-center mr-3">
                     <User className="h-4 w-4 text-clinic-600" />
                   </div>
-                  <span className="font-medium">{patient.name}</span>
+                  <span className="font-medium text-foreground">{patient.name}</span>
                 </div>
                 <div className="relative">
                   <button 
@@ -131,7 +131,7 @@ const PatientList: React.FC<PatientListProps> = ({
                         className="fixed inset-0 z-40"
                         onClick={() => setActiveDropdown(null)}
                       />
-                      <div className="absolute right-0 top-full mt-1 w-48 rounded-md bg-white shadow-elevation-2 border z-50">
+                      <div className="absolute right-0 top-full mt-1 w-48 rounded-md bg-card shadow-elevation-2 border border-border z-50">
                         <div className="py-1">
                           <button
                             className="w-full px-4 py-2 text-left text-sm flex items-center hover:bg-muted transition-colors"
@@ -191,7 +191,7 @@ const PatientList: React.FC<PatientListProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-muted/40">
+              <tr className="border-b border-border bg-muted/40">
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Name
                 </th>
@@ -212,7 +212,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-border">
               {filteredPatients.map((patient) => (
                 <tr key={patient.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -220,7 +220,7 @@ const PatientList: React.FC<PatientListProps> = ({
                       <div className="h-8 w-8 rounded-full bg-clinic-50 flex items-center justify-center mr-3">
                         <User className="h-4 w-4 text-clinic-600" />
                       </div>
-                      <span className="font-medium">{patient.name}</span>
+                      <span className="font-medium text-foreground">{patient.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -258,7 +258,7 @@ const PatientList: React.FC<PatientListProps> = ({
                             className="fixed inset-0 z-40"
                             onClick={() => setActiveDropdown(null)}
                           />
-                          <div className="absolute right-0 top-full mt-1 w-48 rounded-md bg-white shadow-elevation-2 border z-50">
+                          <div className="absolute right-0 top-full mt-1 w-48 rounded-md bg-card shadow-elevation-2 border border-border z-50">
                             <div className="py-1">
                               <button
                                 className="w-full px-4 py-2 text-left text-sm flex items-center hover:bg-muted transition-colors"

@@ -22,10 +22,12 @@ const StatCard: React.FC<StatCardProps> = ({
   className
 }) => {
   return (
-    <div className={cn(
-      "bg-white rounded-2xl p-6 border shadow-elevation-1 animate-scale-in flex flex-col h-full",
-      className
-    )}>
+    <div
+      className={cn(
+        "bg-card rounded-2xl p-6 border border-border shadow-elevation-1 animate-scale-in flex flex-col h-full",
+        className
+      )}
+    >
       <div className="flex justify-between items-start mb-6">
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         <div className="h-9 w-9 rounded-full bg-clinic-50 flex items-center justify-center">
@@ -34,7 +36,7 @@ const StatCard: React.FC<StatCardProps> = ({
       </div>
       
       <div className="mt-auto">
-        <div className="text-3xl font-bold">{value}</div>
+        <div className="text-3xl font-bold text-foreground">{value}</div>
         
         {description && (
           <p className="text-sm text-muted-foreground mt-1">{description}</p>

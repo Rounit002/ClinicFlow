@@ -318,6 +318,54 @@ router.post("/:appointmentId/prescription", auth, isAdmin, upload.single("prescr
   }
 });
 
+router.get("/user/profile", auth, async (req, res) => {
+  const userId = req.user.id;
+  const user = await models.User.findByPk(userId, {
+    attributes: ["id", "username", "email", "phone_number", "role", "created_at", "updated_at"],
+  });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.json(user);
+});
+
+// ✅ Update logged-in user's profile (without bcrypt)
+router.patch("/user/profile", auth, async (req, res) => {
+  try {
+    const userId = req.user.id; // From JWT token via auth middleware
+    const { username, email, phone_number, password } = req.body;
+
+    const user = await models.User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update fields if provided
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (phone_number) user.phone_number = phone_number;
+    if (password) user.password = password; // Save password directly
+
+    await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        phone_number: user.phone_number,
+        role: user.role,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error updating user profile:", error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
 // ✅ Get appointments for a user with associated documents
 router.get("/user/:userId", auth, async (req, res) => {
   try {

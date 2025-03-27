@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Bell, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,21 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    const userStr = localStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+
+    if (user && user.role === 'patient') {
+      navigate('/patient/profile');
+    } else if (user && user.role === 'admin') {
+      navigate('/profile'); // Admin profile route (to be added)
+    } else {
+      navigate('/login'); // Fallback if not logged in
+    }
+  };
+
   return (
     <header className={cn("h-16 px-6 border-b flex items-center justify-between sticky top-0 z-30 bg-background/80 backdrop-blur-sm", className)}>
       <div className="relative w-full max-w-md">
@@ -25,9 +40,12 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
         </button>
         
-        <div className="h-9 w-9 rounded-full bg-clinic-700 text-white flex items-center justify-center text-sm font-medium">
+        <button
+          onClick={handleProfileClick}
+          className="h-9 w-9 rounded-full bg-clinic-700 text-white flex items-center justify-center text-sm font-medium hover:bg-clinic-600 transition-colors"
+        >
           DR
-        </div>
+        </button>
       </div>
     </header>
   );

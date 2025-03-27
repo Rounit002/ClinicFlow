@@ -5,6 +5,18 @@ import db from "../../config/database.js";
 
 const router = express.Router();
 
+const verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ message: 'No token provided' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
 // 🔹 Register User Route
 router.post("/register", async (req, res) => {
   try {
@@ -146,5 +158,17 @@ router.get("/user", async (req, res) => {
   }
 });
 
+router.post('/logout-all', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id; // Assumes JWT contains user ID
+    // Invalidate all sessions (example: delete tokens from a database)
+    // This is a placeholder; implement based on your session management
+    console.log(`Logging out all devices for user ID: ${userId}`);
+    res.status(200).json({ message: 'Logged out from all devices' });
+  } catch (error) {
+    console.error('Logout all error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 export default router;

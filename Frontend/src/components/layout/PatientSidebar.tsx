@@ -55,7 +55,7 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ className }) => {
     { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
     { name: 'Book Appointment', path: '/patient/book-appointment', icon: CalendarPlus },
     { name: 'Prescriptions', path: '/patient/prescriptions', icon: FileText },
-    { name: 'Bills', path: '/patient/bills', icon: FileText },
+    // { name: 'Bills', path: '/patient/bills', icon: FileText },
     { name: 'Profile', path: '/patient/profile', icon: User },
   ];
 
