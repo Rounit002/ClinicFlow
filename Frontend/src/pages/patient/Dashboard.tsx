@@ -139,9 +139,9 @@ const PatientDashboard = () => {
               <span>Book Appointment</span>
             </Button>
 
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center gap-2" onClick={() => navigate('/patient/bills')}>
+            <Button variant="outline" className="h-auto p-4 flex flex-col items-center justify-center gap-2" onClick={() => navigate('/patient/prescriptions')}>
               <CreditCard className="h-6 w-6 text-blue-600" />
-              <span>View Bills</span>
+              <span>My Appointment</span>
             </Button>
           </div>
         </div>
