@@ -14,19 +14,48 @@ import path from "path";
 dotenv.config();
 const app = express();
 
-const _dirname=path.resolve();
+const _dirname = path.resolve();
 
-// ✅ Middleware
-app.use(cors({
-  origin: [
-    "https://clinicflow-e7a9.onrender.com", // Your web app
-    "http://localhost", // Cordova WebView (for development)
-    "https://localhost", // Add this for USB debugging
-    "file://" // Cordova WebView (for production on device)
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+// ✅ Middleware to handle preflight OPTIONS requests
+app.options("*", cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://clinicflow-e7a9.onrender.com",
+      "http://localhost",
+      "https://localhost",
+      "file://"
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
+// ✅ Apply CORS middleware to all routes
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://clinicflow-e7a9.onrender.com",
+      "http://localhost",
+      "https://localhost",
+      "file://"
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 204
 }));
 
 app.use(express.json());
@@ -44,10 +73,10 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/documents", documentRoutes); // ✅ Register document API
 app.use("/api/users", userRoutes);
 
-app.use(express.static(path.join(_dirname,"/Frontend/dist")));
-app.get('*',(_,res)=>{
-  res.sendFile(path.resolve(_dirname,"Frontend","dist","index.html"));
-})
+app.use(express.static(path.join(_dirname, "/Frontend/dist")));
+app.get('*', (_, res) => {
+  res.sendFile(path.resolve(_dirname, "Frontend", "dist", "index.html"));
+});
 
 // ✅ Handle 404 for Undefined Routes
 app.use((req, res) => {

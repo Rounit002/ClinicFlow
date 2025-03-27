@@ -33,7 +33,6 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ loginIdentifier, password }),
-        credentials: 'include',
       });
 
       console.log('Login response status:', response.status);

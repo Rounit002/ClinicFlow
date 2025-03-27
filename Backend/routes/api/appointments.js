@@ -332,6 +332,9 @@ router.get("/user/profile", auth, async (req, res) => {
 // ✅ Update logged-in user's profile (without bcrypt)
 router.patch("/user/profile", auth, async (req, res) => {
   try {
+    console.log("🔍 Updating profile for user ID:", req.user.id);
+    console.log("📥 Request body:", req.body);
+
     const userId = req.user.id; // From JWT token via auth middleware
     const { username, email, phone_number, password } = req.body;
 
@@ -344,9 +347,11 @@ router.patch("/user/profile", auth, async (req, res) => {
     if (username) user.username = username;
     if (email) user.email = email;
     if (phone_number) user.phone_number = phone_number;
-    if (password) user.password = password; // Save password directly
+    if (password) user.password = password; // Save password directly (as per request)
 
     await user.save();
+
+    console.log("✅ Profile updated successfully for user ID:", userId);
 
     res.json({
       message: "Profile updated successfully",

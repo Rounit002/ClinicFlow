@@ -1,4 +1,3 @@
-// Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTitle from '@/components/ui/PageTitle';
@@ -32,7 +31,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token being sent:', token); // Debug token
+        console.log('Fetching profile with token:', token); // Debug token
         if (!token) {
           setError('No authentication token found. Please log in again.');
           return;
@@ -44,20 +43,21 @@ const Profile = () => {
           },
         });
 
+        console.log('Fetch profile response status:', response.status); // Debug response status
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('Fetch error response:', errorData); // Debug server response
+          console.error('Fetch profile error response:', errorData); // Debug server response
           throw new Error(errorData.message || `Failed to fetch profile (Status: ${response.status})`);
         }
 
         const data = await response.json();
+        console.log('Fetched profile data:', data); // Debug fetched data
         setUser(data);
         setFormData(data);
       } catch (error) {
         console.error('Error fetching profile:', error);
         setError(error.message || 'Failed to load profile. Please try again.');
         toast.error(error.message || 'Failed to load profile');
-        // Do not navigate to /login automatically
       }
     };
 
@@ -77,6 +77,7 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('Saving profile with token:', token); // Debug token
       if (!token) {
         setError('No authentication token found. Please log in again.');
         return;
@@ -91,6 +92,7 @@ const Profile = () => {
         updateData.password = passwordData.newPassword;
       }
 
+      console.log('Update data being sent:', updateData); // Debug request body
       const response = await fetch(`https://clinicflow-e7a9.onrender.com/api/appointments/user/profile`, {
         method: 'PATCH',
         headers: {
@@ -100,12 +102,15 @@ const Profile = () => {
         body: JSON.stringify(updateData),
       });
 
+      console.log('Save profile response status:', response.status); // Debug response status
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Save profile error response:', errorData); // Debug server response
         throw new Error(errorData.message || 'Failed to update profile');
       }
 
       const updatedUser = await response.json();
+      console.log('Updated user data:', updatedUser); // Debug response data
       setUser(updatedUser.user);
       setFormData(updatedUser.user);
       setPasswordData({ newPassword: '', confirmPassword: '' });
