@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigation
+import { useNavigate } from "react-router-dom";
 import PageTitle from "@/components/ui/PageTitle";
-import PatientList, { Patient } from "@/components/patients/PatientList";
+import PatientList from "@/components/patients/PatientList";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 const Patients = () => {
-  const navigate = useNavigate(); // ✅ Initialize navigation
+  const navigate = useNavigate();
   const { toast: uiToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [patients, setPatients] = useState([]);
+  const [error, setError] = useState(null);
 
-  // ✅ Fetch patients from API
   const fetchPatients = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // ✅ Get token from localStorage
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication required");
@@ -34,19 +33,14 @@ const Patients = () => {
         },
       });
 
-      console.log("Patient fetch response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to fetch patients");
       }
 
       const data = await response.json();
-      console.log("Patients data received:", data);
-
       setPatients(data);
     } catch (err) {
-      console.error("Error fetching patients:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch patients");
       toast.error("Failed to load patients data");
     } finally {
@@ -54,34 +48,26 @@ const Patients = () => {
     }
   };
 
-  // ✅ Fetch patients on component mount
   useEffect(() => {
     fetchPatients();
   }, []);
 
   const handleAddPatient = () => {
-    console.log("Add new patient");
     uiToast({
       title: "Patient Management",
       description: "Add patient feature coming soon",
     });
   };
 
-  const handleEditPatient = (patient: Patient) => {
+  const handleEditPatient = (patient) => {
     if (!patient || !patient.id) {
-      console.error("❌ Error: Patient ID is missing");
       toast.error("Invalid patient data. Cannot edit.");
       return;
     }
-  
-    const editUrl = `/patients/${patient.id}/edit`;
-    console.log(`🔄 Navigating to: ${editUrl}`); // ✅ Debugging log
-    navigate(editUrl); // ✅ Navigate to Edit Page
+    navigate(`/patients/${patient.id}/edit`);
   };
-  
 
-  const handleDeletePatient = (patient: Patient) => {
-    console.log("Delete patient:", patient);
+  const handleDeletePatient = (patient) => {
     uiToast({
       title: "Patient Management",
       description: `Delete patient feature coming soon`,
@@ -90,23 +76,47 @@ const Patients = () => {
   };
 
   return (
-    <div>
-      <PageTitle title="Patients" description="Manage and view patient records." />
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-
-      <PatientList
-        patients={patients}
-        isLoading={isLoading}
-        onAddPatient={handleAddPatient}
-        onEditPatient={handleEditPatient} // ✅ Pass edit function
-        onDeletePatient={handleDeletePatient}
-      />
-    </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen p-8 relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #E0EFFF, #F0F7FF)' }} // clinic-100 to clinic-50
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-white/30" />
+      <div className="relative z-10">
+        <PageTitle
+          title="Patients"
+          description="Manage patient records"
+          className="text-clinic-700"
+        />
+        {error && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="bg-clinic-50 border border-clinic-300 text-clinic-800 px-4 py-3 rounded-xl mb-6"
+          >
+            {error}
+          </motion.div>
+        )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="gradient-border"
+        >
+          <PatientList
+            patients={patients}
+            isLoading={isLoading}
+            onAddPatient={handleAddPatient}
+            onEditPatient={handleEditPatient}
+            onDeletePatient={handleDeletePatient}
+          />
+        </motion.div>
+      </div>
+    </motion.div>
   );
 };
 

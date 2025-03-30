@@ -24,22 +24,22 @@ const StatCard: React.FC<StatCardProps> = ({
   return (
     <div
       className={cn(
-        "bg-card rounded-2xl p-6 border border-border shadow-elevation-1 animate-scale-in flex flex-col h-full",
+        "bg-gradient-to-br from-white to-blue-50 rounded-xl p-6 shadow-elevation-1 animate-scale-in flex flex-col h-full",
         className
       )}
     >
       <div className="flex justify-between items-start mb-6">
-        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-        <div className="h-9 w-9 rounded-full bg-clinic-50 flex items-center justify-center">
-          <Icon className="h-5 w-5 text-clinic-700" />
+        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+        <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
+          <Icon className="h-5 w-5 text-blue-700" />
         </div>
       </div>
       
       <div className="mt-auto">
-        <div className="text-3xl font-bold text-foreground">{value}</div>
+        <div className="text-3xl font-bold text-gray-800">{value}</div>
         
         {description && (
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          <p className="text-sm text-gray-600 mt-1">{description}</p>
         )}
         
         {trend && trendValue && (

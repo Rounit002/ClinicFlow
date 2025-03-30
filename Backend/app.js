@@ -38,25 +38,25 @@ app.options("*", cors({
 }));
 
 // ✅ Apply CORS middleware to all routes
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "https://clinicflow-e7a9.onrender.com",
-      "http://localhost",
-      "https://localhost",
-      "file://"
-    ];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-  optionsSuccessStatus: 204
-}));
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     const allowedOrigins = [
+//       "https://clinicflow-e7a9.onrender.com",
+//       "http://localhost",
+//       "https://localhost",
+//       "file://"
+//     ];
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   credentials: true,
+//   optionsSuccessStatus: 204
+// }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // ✅ Handle form data
